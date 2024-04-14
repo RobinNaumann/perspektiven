@@ -21,7 +21,7 @@ screenshots:
   - https://raw.githubusercontent.com/RobinNaumann/perspektiven/main/assets/screenshots/sc2.png
   - https://raw.githubusercontent.com/RobinNaumann/perspektiven/main/assets/screenshots/sc3.png
 releases: 
-  - version: 0.2.3
+  - version: 0.3.4
     downloads:
       - platform: Android
         url: https://github.com/RobinNaumann/perspektiven/releases/download/0.3.4/perspektiven_0.3.4.apk
