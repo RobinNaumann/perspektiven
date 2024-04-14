@@ -1,9 +1,25 @@
 import 'package:elbe/elbe.dart';
+import 'package:moewe/moewe.dart';
 import 'package:newsy/bit/b_config.dart';
 import 'package:newsy/view/v_home.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  String version = "unknown";
+  try {
+    final pInfo = await PackageInfo.fromPlatform();
+    version = "${pInfo.version}+${pInfo.buildNumber}";
+  } catch (e) {
+    //
+  }
+
+  // setup Moewe for crash logging
+  Moewe(
+      host: "moewe.robbb.in",
+      project: "0d0f49eaf6318720",
+      appId: "1hdk97r39kdk2ifk",
+      appVersion: version);
+
   runApp(MyApp());
 }
 

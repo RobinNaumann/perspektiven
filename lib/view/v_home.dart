@@ -3,6 +3,7 @@ import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:newsy/main.dart';
 import 'package:newsy/view/v_article_list.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,28 +37,52 @@ class _ShareToViewState extends State<_ShareToView> {
     setState(() => error = msg);
   }
 
-  @override
-  void initState() {
-    super.initState();
+  load(String link) {
+    setState(() => error = null);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => ArticlePage(newsUrl: link)),
+    );
+  }
+
+  void emit(String? link, String? error) {
+    if (error != null) {
+      setError(error);
+      return;
+    }
+    if (link != null) {
+      load(link);
+    }
+    listen();
+  }
+
+  listen() {
     FlutterSharingIntent.instance
         .getInitialSharing()
         .then((List<SharedFile> value) {
       final shared = value.firstOrNull;
       if (shared == null) return;
+
+      if (shared.type == SharedMediaType.URL && shared.value != null) {
+        return emit(shared.value!, null);
+      }
+
       if (shared.type != SharedMediaType.TEXT) {
-        return setError("Die App versteht nur Text");
+        return emit(null, "Die App versteht nur Text");
       }
 
       final link = shared.value
           ?.split(RegExp(r'\s'))
           .firstWhereOrNull((e) => e.trim().startsWith("https://"));
 
-      if (link == null) return setError("es wurde kein Link gefunden");
-      setState(() => error = null);
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => ArticlePage(newsUrl: link)),
-      );
+      if (link == null) return emit(null, "es wurde kein Link gefunden");
+      emit(link, null);
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    listen();
   }
 
   @override
@@ -86,7 +111,7 @@ class _ShareToViewState extends State<_ShareToView> {
                     child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 290),
                         child: const Text(
-                            "teile einen Nachrichtenartikel aus dem Browser oder deiner Nachrichten-App, um dir andere Perspektiven zum gleichen Thema anzusehen",
+                            "teile einen Nachrichtenartikel aus dem Browser oder deiner Nachrichten-App mit dieser App, um dir andere Perspektiven zum gleichen Thema anzusehen",
                             textAlign: TextAlign.center)),
                   ),
                 ].spaced()),
@@ -94,15 +119,48 @@ class _ShareToViewState extends State<_ShareToView> {
           Row(
             children: [
               Expanded(
-                  child: const Button.integrated(
-                      icon: Icons.globe2, label: "website")),
+                  child: Button.integrated(
+                      icon: Icons.globe2,
+                      label: "website",
+                      onTap: () => launchUrlString("https://robbb.in",
+                          mode: LaunchMode.externalApplication))),
               Expanded(
-                  child: const Button.integrated(
-                      icon: Icons.github, label: "source"))
+                  child: Button.integrated(
+                      icon: Icons.github,
+                      label: "source",
+                      onTap: () => launchUrlString(
+                          "https://github.com/RobinNaumann/perspektiven",
+                          mode: LaunchMode.externalApplication)))
             ],
           ),
+          Padded.only(top: 1, child: const VersionInfo())
         ],
       ),
     );
+  }
+}
+
+class VersionInfo extends StatefulWidget {
+  const VersionInfo({super.key});
+
+  @override
+  State<VersionInfo> createState() => _VersionInfoState();
+}
+
+class _VersionInfoState extends State<VersionInfo> {
+  String? version;
+
+  @override
+  void initState() {
+    super.initState();
+
+    PackageInfo.fromPlatform().then((value) {
+      setState(() => version = "${value.version}+${value.buildNumber}");
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.bodyS("${version ?? ""} | Robin 2024");
   }
 }

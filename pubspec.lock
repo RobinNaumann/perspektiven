@@ -296,6 +296,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  moewe:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "35ea7faba2dde590d922105f250e649ec903f538"
+      url: "https://github.com/RobinNaumann/moewe_dart.git"
+    source: git
+    version: "1.0.0"
   package_info_plus:
     dependency: transitive
     description:

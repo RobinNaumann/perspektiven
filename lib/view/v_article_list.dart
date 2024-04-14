@@ -16,6 +16,23 @@ class ArticlePage extends StatelessWidget {
     return BitProvider(
         create: (_) => ArticleBit(url: newsUrl),
         child: ArticleBit.builder(
+            onLoading: (bit, loading) => Scaffold(
+                title: "",
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator.adaptive(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.fileSearch),
+                        const Text("analysiere...",
+                            textAlign: TextAlign.center),
+                      ].spaced(),
+                    ),
+                  ].spaced(amount: 3),
+                )),
             onError: (bit, error) => const Scaffold(
                   leadingIcon: LeadingIcon.close(),
                   actions: [ThemeToggleBtn()],
@@ -29,8 +46,9 @@ class ArticlePage extends StatelessWidget {
                     data.article.urlToImage!,
                     fit: BoxFit.cover,
                   ),
+                  actions: const [ThemeToggleBtn()],
                   leadingIcon: const LeadingIcon.close(),
-                  title: "Article",
+                  title: "Artikel",
                   body: Padded.only(
                     left: 1,
                     right: 1,
@@ -47,9 +65,10 @@ class ArticlePage extends StatelessWidget {
                                 Text.h6(
                                     "Leserschaft von ${data.currentOutlet.name}"),
                                 InkWell(
-                                  onTap: () =>
-                                      launchUrlString("https://agma-mmc.de"),
-                                  child: Text.bodyS("Daten von agma e.V.",
+                                  onTap: () => launchUrlString(
+                                      "https://agma-mmc.de",
+                                      mode: LaunchMode.externalApplication),
+                                  child: const Text.bodyS("Daten von agma e.V.",
                                       variant: TypeVariants.italic),
                                 ),
                               ]),
@@ -116,11 +135,17 @@ class ArticleSnippet extends StatelessWidget {
     return InkWell(
         onTap: () {
           if (article.url?.isNotEmpty ?? false) {
-            launchUrlString(article.url!);
+            launchUrlString(article.url!, mode: LaunchMode.externalApplication);
             return;
           }
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("kein Link verfügbar", color: Colors.white),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("kein Link verfügbar",
+                color: ColorTheme.of(context)
+                    .activeMode
+                    .inverse
+                    .plain
+                    .neutral
+                    .front),
           ));
         },
         child:
@@ -144,8 +169,9 @@ class OutletSnippet extends StatelessWidget {
         Expanded(child: Text(outlet.name, variant: TypeVariants.bold)),
         if (cred != null)
           Card(
-              onTap: () => launchUrlString(outlet.rating?.sourceUrl ??
-                  "https://mediabiasfactcheck.com/"),
+              onTap: () => launchUrlString(
+                  outlet.rating?.sourceUrl ?? "https://mediabiasfactcheck.com/",
+                  mode: LaunchMode.externalApplication),
               padding:
                   const RemInsets.symmetric(vertical: 0.2, horizontal: 0.3),
               style: cred > 0.5

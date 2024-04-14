@@ -20,8 +20,14 @@ class OutletAudienceChart extends StatelessWidget {
           outlets.map((e) => e.audience).toList(), color1, color2));
 
   void showToast(BuildContext context, String message) =>
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message, color: Colors.white)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(message,
+              color: ColorTheme.of(context)
+                  .activeMode
+                  .inverse
+                  .plain
+                  .neutral
+                  .front)));
 
   Widget _label(
           {required Alignment align,

@@ -1,4 +1,5 @@
 import 'package:elbe/bit/bit/bit_control.dart';
+import 'package:moewe/moewe.dart';
 import 'package:newsy/service/s_news.dart';
 import 'package:newsy/service/s_outlets.dart';
 
@@ -40,6 +41,8 @@ class ArticleBit extends MapMsgBitControl<ArticleState> {
                   outlet: outlet))
               .where((g) => g.articles.isNotEmpty)
               .toList();
+
+          Moewe.i.event("analyze_article", {"count": groups.length});
 
           return ArticleState(
               article: article, currentOutlet: currentOutlet, groups: groups);
